@@ -9,20 +9,14 @@ build/
 builds/
 UnityGenerated/
 
-.sln
-.csproj
-.unityproj
-.suo
-.tmp
-.user
-.userprefs
-.pidb
-.pidb.meta
-.booproj
-.svd
+# VS
+*.sln
+*.csproj
+*.unityproj
+*.user
+*.userprefs
 
 sysinfo.txt
-
 
 # Executables
 *.exe
