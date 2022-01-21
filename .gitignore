@@ -1,0 +1,8 @@
+# Folders
+.vs/
+x64/
+.cache/
+.obj/
+
+# Executables
+*.exe
