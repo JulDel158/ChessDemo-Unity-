@@ -3,6 +3,27 @@
 x64/
 .cache/
 .obj/
+.Library/
+.build/
+.builds/
+.UnityGenerated/
+
+.sln
+.csproj
+.unityproj
+.suo
+.tmp
+.user
+.userprefs
+.pidb
+.pidb.meta
+.booproj
+.svd
+
+sysinfo.txt
+
 
 # Executables
 *.exe
+*.apk
+*.unitypackage
