@@ -2,11 +2,12 @@
 .vs/
 x64/
 .cache/
-.obj/
-.Library/
-.build/
-.builds/
-.UnityGenerated/
+cache/
+obj/
+Library/
+build/
+builds/
+UnityGenerated/
 
 .sln
 .csproj
