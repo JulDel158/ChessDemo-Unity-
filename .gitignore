@@ -8,6 +8,11 @@ Library/
 build/
 builds/
 UnityGenerated/
+Logs/
+Temp/
+
+# Extensions
+*.log
 
 # VS
 *.sln

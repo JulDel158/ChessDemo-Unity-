@@ -59,6 +59,15 @@ public class Tile : MonoBehaviour
         return false;
     }
 
+    public void MovePieceTo(ref Tile target)
+    {
+        if (target.piece) { Destroy(target.piece.gameObject); }
+
+        target.piece = piece;
+        piece.transform.position = target.transform.position;
+        piece = null;
+    }
+
     private void OnMouseEnter()
     {
         //highlight.SetActive(true);

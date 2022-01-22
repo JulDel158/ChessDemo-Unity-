@@ -257,6 +257,9 @@ MonoBehaviour:
   height: 8
   tilePrefab: {fileID: 4586688123642168629, guid: 56f9b1304c838e5418ca3307355a124b, type: 3}
   cam: {fileID: 519420031}
+  current: {fileID: 0}
+  piecePrefab: {fileID: 7102091279091386020, guid: 11fea7d169c5bf0428a0126d8f1e13a6, type: 3}
+  movableSpaces: []
 --- !u!61 &1600604018
 BoxCollider2D:
   m_ObjectHideFlags: 0

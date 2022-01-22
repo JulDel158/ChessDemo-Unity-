@@ -21,7 +21,11 @@ public class GridManager : MonoBehaviour
     [SerializeField]
     private Camera cam;
 
+    [SerializeField]
     private Tile current;
+
+    [SerializeField]
+    private ChessPiece piecePrefab;
 
     private bool liftedFinger;
 
@@ -37,10 +41,12 @@ public class GridManager : MonoBehaviour
 
         InitGrid();
         // temporary spawning a chess piece at (0, 0) tiles
-        tiles[0, 0].piece = Instantiate(tiles[0, 0].piece, tiles[0, 0].transform);
+        tiles[0, 0].piece = Instantiate(piecePrefab, tiles[0, 0].transform);
         tiles[0, 0].piece.pieceType = ChessPiece.TYPE.KING;
-        tiles[0, 1].piece = Instantiate(tiles[0, 1].piece, tiles[0, 1].transform);
+        tiles[0, 0].piece.name = "KING1";
+        tiles[0, 1].piece = Instantiate(piecePrefab, tiles[0, 1].transform);
         tiles[0, 1].piece.pieceType = ChessPiece.TYPE.PAWN;
+        tiles[0, 1].piece.name = "PAWN1";
         // moving camera position to match grid's dimmensions
         cam.transform.position = new Vector3((float)width / 2.0f - 0.5f, (float)height / 2.0f - 0.5f, -10.0f);
 
@@ -73,10 +79,18 @@ public class GridManager : MonoBehaviour
             {
                 p.Highlight(false);
             }
-            movableSpaces.Clear();
+
+            // before we clear we must move our piece if selecting a target distination
+            // movableSpaces.Clear();
         } 
 
         var selected = getTileAt((uint)(pos.x + 0.5f), (uint)(pos.y + 0.5f)); // retriving the piece being touched
+        if (movableSpaces.Contains(selected) && current.HasPiece()) {
+            current.MovePieceTo(ref selected);
+            current = null;
+            selected = null;
+        }
+        movableSpaces.Clear();
         current = (selected == current) ? null : selected;
 
         // if this tile has a valid piece, highlight it

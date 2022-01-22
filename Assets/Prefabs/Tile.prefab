@@ -188,7 +188,9 @@ MonoBehaviour:
   srenderer: {fileID: 4586688123642168626}
   highlight: {fileID: 4001636299096825024}
   neighbors: []
-  piece: {fileID: 7102091279091386020, guid: 11fea7d169c5bf0428a0126d8f1e13a6, type: 3}
+  piece: {fileID: 0}
+  x: 0
+  y: 0
 --- !u!61 &7267127975718614333
 BoxCollider2D:
   m_ObjectHideFlags: 0
