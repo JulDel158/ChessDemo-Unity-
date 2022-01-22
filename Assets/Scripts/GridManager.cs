@@ -44,9 +44,15 @@ public class GridManager : MonoBehaviour
         tiles[0, 0].piece = Instantiate(piecePrefab, tiles[0, 0].transform);
         tiles[0, 0].piece.pieceType = ChessPiece.TYPE.KING;
         tiles[0, 0].piece.name = "KING1";
+
         tiles[0, 1].piece = Instantiate(piecePrefab, tiles[0, 1].transform);
         tiles[0, 1].piece.pieceType = ChessPiece.TYPE.PAWN;
         tiles[0, 1].piece.name = "PAWN1";
+
+        tiles[6, 2].piece = Instantiate(piecePrefab, tiles[6, 2].transform);
+        tiles[6, 2].piece.pieceType = ChessPiece.TYPE.PAWN;
+        tiles[6, 2].piece.name = "PAWN2";
+        tiles[6, 2].piece.SetPlayer(false);
         // moving camera position to match grid's dimmensions
         cam.transform.position = new Vector3((float)width / 2.0f - 0.5f, (float)height / 2.0f - 0.5f, -10.0f);
 
@@ -113,56 +119,180 @@ public class GridManager : MonoBehaviour
         {
             case ChessPiece.TYPE.PAWN:
                 {
-                    uint y = current.piece.IsPlayer1() ? py + 1 : py - 1;
-                    for (uint x = px - 1; x <= px + 1; ++x)
-                    {
-                        var curr = getTileAt(x, y);
-                        if (curr == null) { continue; }
-
-                        if (x != px && curr.HasPiece())
-                        {
-                            movableSpaces.Add(curr);
-                        } else if (x == px) {
-                            movableSpaces.Add(curr);
-                        }
-                    }
-
+                    PawnMoveSet(px, py);
                     break;
                 }
             case ChessPiece.TYPE.KNIGHT:
-                break;
+                {
+                    KnightMoveSet(px, py);
+                    break;
+                }
             case ChessPiece.TYPE.BISHOP:
-                break;
+                {
+                    BishopMoveSet(px, py);
+                    break;
+                }
             case ChessPiece.TYPE.ROOK:
-                break;
+                {
+                    RookMoveSet(px, py);
+                    break;
+                }
             case ChessPiece.TYPE.QUEEN:
-                break;
+                {
+                    // must move like the bishop and the rook
+                    BishopMoveSet(px, py);
+                    RookMoveSet(px, py);
+                    break;
+                }
             case ChessPiece.TYPE.KING:
                 {
-                    for (uint y = (py > 0) ? py - 1 : py; y <= py + 1; ++y)
-                    {
-                        for (uint x = (px > 0) ? px - 1 : px; x <= px + 1; ++x)
-                        {
-                            if (x == px && y == py) { continue; }
-
-                            var curr = getTileAt(x, y);
-
-                            if (curr == null) { continue; }
-
-                            movableSpaces.Add(curr);
-                        }
-                    }
+                    KingMoveSet(px, py);
                 }
                 break;
             default:
                 break;
         }
 
-        foreach (var p in movableSpaces)
+        // highlighting all posible target and removing any invalid targets
+        for (int i = 0; i < movableSpaces.Count; ++i)
         {
+            var p = movableSpaces[i];
+            if (p.HasPiece() && p.piece.IsPlayer1() == current.piece.IsPlayer1())
+            {
+                movableSpaces.RemoveAt(i--);
+                continue;
+            }
+
             p.Highlight(true);
         }
+    }
 
+    private void PawnMoveSet(in uint px, in uint py)
+    {
+        uint y = current.piece.IsPlayer1() ? py + 1 : py - 1;
+        for (uint x = px - 1; x <= px + 1; ++x)
+        {
+            var curr = getTileAt(x, y);
+            if (curr == null) { continue; }
+
+            if (x != px && curr.HasPiece())
+            {
+                movableSpaces.Add(curr);
+            }
+            else if (x == px)
+            {
+                movableSpaces.Add(curr);
+            }
+        }
+    }
+
+    private void KingMoveSet(in uint px, in uint py)
+    {
+        for (uint y = (py > 0) ? py - 1 : py; y <= py + 1; ++y)
+        {
+            for (uint x = (px > 0) ? px - 1 : px; x <= px + 1; ++x)
+            {
+                if (x == px && y == py) { continue; }
+
+                var curr = getTileAt(x, y);
+
+                if (curr == null) { continue; }
+
+                movableSpaces.Add(curr);
+            }
+        }
+    }
+
+    private void KnightMoveSet(in uint px, in uint py)
+    {
+        var curr = getTileAt(px - 2, py - 1);
+        if (curr) { movableSpaces.Add(curr); }
+        curr = getTileAt(px - 2, py + 1);
+        if (curr) { movableSpaces.Add(curr); }
+
+        curr = getTileAt(px + 2, py - 1);
+        if (curr) { movableSpaces.Add(curr); }
+        curr = getTileAt(px + 2, py + 1);
+        if (curr) { movableSpaces.Add(curr); }
+
+        curr = getTileAt(px - 1, py - 2);
+        if (curr) { movableSpaces.Add(curr); }
+        curr = getTileAt(px + 1, py - 2);
+        if (curr) { movableSpaces.Add(curr); }
+
+        curr = getTileAt(px - 1, py + 2);
+        if (curr) { movableSpaces.Add(curr); }
+        curr = getTileAt(px + 1, py + 2);
+        if (curr) { movableSpaces.Add(curr); }
+    }
+
+    private void BishopMoveSet(in uint px, in uint py)
+    {
+        Tile curr = null;
+        // moving (/)
+        for (uint y = py, x = px; y < height && x < width; ++y, ++x)
+        {
+            curr = getTileAt(x, y);
+            movableSpaces.Add(curr);
+            if (curr.HasPiece()) { break; }
+        }
+
+        for (int y = (int)py, x = (int)px; y >= 0 && x >= 0; --y, --x)
+        {
+            curr = getTileAt((uint)x, (uint)y);
+            movableSpaces.Add(curr);
+            if (curr.HasPiece()) { break; }
+        }
+
+        // moving (\)
+        for (int y = (int)py, x = (int)px; y >= 0 && x < width; --y, ++x)
+        {
+            curr = getTileAt((uint)x, (uint)y);
+            movableSpaces.Add(curr);
+            if (curr.HasPiece()) { break; }
+        }
+
+        for (int y = (int)py, x = (int)px; y < height && x >= 0; ++y, --x)
+        {
+            curr = getTileAt((uint)x, (uint)y);
+            movableSpaces.Add(curr);
+            if (curr.HasPiece()) { break; }
+        }
+    }
+
+    private void RookMoveSet(in uint px, in uint py)
+    {
+        Tile curr = null;
+
+        // moving along the x axist const y value
+        for (uint x1 = px + 1; x1 < width; ++x1)
+        {
+            curr = getTileAt(x1, py);
+            movableSpaces.Add(curr);
+            if (curr.HasPiece()) { break; }
+        }
+
+        for (int x1 = (int)px - 1; x1 >= 0; --x1)
+        {
+            curr = getTileAt((uint)x1, py);
+            movableSpaces.Add(curr);
+            if (curr.HasPiece()) { break; }
+        }
+
+        // moving along the y axist const x value
+        for (uint y1 = py + 1; y1 < height; ++y1)
+        {
+            curr = getTileAt(px, y1);
+            movableSpaces.Add(curr);
+            if (curr.HasPiece()) { break; }
+        }
+
+        for (int y1 = (int)py - 1; y1 >= 0; --y1)
+        {
+            curr = getTileAt(px, (uint)y1);
+            movableSpaces.Add(curr);
+            if (curr.HasPiece()) { break; }
+        }
     }
 
     // sets all variables in the grid to false
