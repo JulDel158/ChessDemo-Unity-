@@ -17,12 +17,17 @@ public class ChessPiece : MonoBehaviour
     [SerializeField]
     private bool isPlayer1 = true;
 
-    [SerializeField]
-    private int value;
+
+    public int value { get; private set; }
 
     public TYPE pieceType { set; get; } = TYPE.NONE;
 
     public void SetPlayer(bool player1) { isPlayer1 = player1; }
+
+    public void SetValue(int v)
+    {
+        value = v;
+    }
 
     public bool IsPlayer1 ()
     {

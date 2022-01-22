@@ -76,6 +76,8 @@ public class GridManager : MonoBehaviour
             ChessPiece.TYPE.ROOK
         };
 
+        int[] values = { 5, 3, 3, 9, 0, 3, 3, 5 };
+
         // Player 1
         uint y1 = 0, y2 = 1, y3 = height - 2, y4 = height - 1;
         for (uint x = 0; x < (uint)set.Count; ++x)
@@ -88,6 +90,8 @@ public class GridManager : MonoBehaviour
             pawn2.piece = Instantiate(piecePrefab, pawn2.transform);
             pawn2.piece.SetPlayer(false);
 
+            pawn1.piece.SetValue(1);
+            pawn2.piece.SetValue(1);
             pawn1.piece.pieceType = pawn2.piece.pieceType = ChessPiece.TYPE.PAWN;
 
             var piece1 = getTileAt(x, y1);
@@ -98,6 +102,8 @@ public class GridManager : MonoBehaviour
             piece2.piece = Instantiate(piecePrefab, piece2.transform);
             piece2.piece.SetPlayer(false);
 
+            piece1.piece.SetValue(values[x]);
+            piece2.piece.SetValue(values[x]);
             piece1.piece.pieceType = piece2.piece.pieceType = set[(int)x];
         }
     }
@@ -213,9 +219,9 @@ public class GridManager : MonoBehaviour
     private void PawnMoveSet(in uint px, in uint py)
     {
         uint y = current.piece.IsPlayer1() ? py + 1 : py - 1;
-        for (uint x = px - 1; x <= px + 1; ++x)
+        for (int x = (int)px - 1; x <= px + 1; ++x)
         {
-            var curr = getTileAt(x, y);
+            var curr = getTileAt((uint)x, y);
             if (curr == null) { continue; }
 
             if (x != px && curr.HasPiece())
@@ -224,23 +230,6 @@ public class GridManager : MonoBehaviour
             }
             else if (x == px)
             {
-                movableSpaces.Add(curr);
-            }
-        }
-    }
-
-    private void KingMoveSet(in uint px, in uint py)
-    {
-        for (uint y = (py > 0) ? py - 1 : py; y <= py + 1; ++y)
-        {
-            for (uint x = (px > 0) ? px - 1 : px; x <= px + 1; ++x)
-            {
-                if (x == px && y == py) { continue; }
-
-                var curr = getTileAt(x, y);
-
-                if (curr == null) { continue; }
-
                 movableSpaces.Add(curr);
             }
         }
@@ -335,6 +324,23 @@ public class GridManager : MonoBehaviour
             curr = getTileAt(px, (uint)y1);
             movableSpaces.Add(curr);
             if (curr.HasPiece()) { break; }
+        }
+    }
+
+    private void KingMoveSet(in uint px, in uint py)
+    {
+        for (uint y = (py > 0) ? py - 1 : py; y <= py + 1; ++y)
+        {
+            for (uint x = (px > 0) ? px - 1 : px; x <= px + 1; ++x)
+            {
+                if (x == px && y == py) { continue; }
+
+                var curr = getTileAt(x, y);
+
+                if (curr == null) { continue; }
+
+                movableSpaces.Add(curr);
+            }
         }
     }
 
