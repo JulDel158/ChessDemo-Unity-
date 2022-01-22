@@ -40,23 +40,66 @@ public class GridManager : MonoBehaviour
         Input.multiTouchEnabled = false;
 
         InitGrid();
-        // temporary spawning a chess piece at (0, 0) tiles
-        tiles[0, 0].piece = Instantiate(piecePrefab, tiles[0, 0].transform);
-        tiles[0, 0].piece.pieceType = ChessPiece.TYPE.KING;
-        tiles[0, 0].piece.name = "KING1";
+        InitBoard();
 
-        tiles[0, 1].piece = Instantiate(piecePrefab, tiles[0, 1].transform);
-        tiles[0, 1].piece.pieceType = ChessPiece.TYPE.PAWN;
-        tiles[0, 1].piece.name = "PAWN1";
-
-        tiles[6, 2].piece = Instantiate(piecePrefab, tiles[6, 2].transform);
-        tiles[6, 2].piece.pieceType = ChessPiece.TYPE.PAWN;
-        tiles[6, 2].piece.name = "PAWN2";
-        tiles[6, 2].piece.SetPlayer(false);
         // moving camera position to match grid's dimmensions
         cam.transform.position = new Vector3((float)width / 2.0f - 0.5f, (float)height / 2.0f - 0.5f, -10.0f);
 
         liftedFinger = true;
+    }
+
+    private void InitBoard()
+    {
+        // temporary spawning a chess piece at (0, 0) tiles
+        //tiles[0, 0].piece = Instantiate(piecePrefab, tiles[0, 0].transform);
+        //tiles[0, 0].piece.pieceType = ChessPiece.TYPE.KING;
+        //tiles[0, 0].piece.name = "KING1";
+
+        //tiles[0, 1].piece = Instantiate(piecePrefab, tiles[0, 1].transform);
+        //tiles[0, 1].piece.pieceType = ChessPiece.TYPE.PAWN;
+        //tiles[0, 1].piece.name = "PAWN1";
+
+        //tiles[6, 2].piece = Instantiate(piecePrefab, tiles[6, 2].transform);
+        //tiles[6, 2].piece.pieceType = ChessPiece.TYPE.PAWN;
+        //tiles[6, 2].piece.name = "PAWN2";
+        //tiles[6, 2].piece.SetPlayer(false);
+
+        List<ChessPiece.TYPE> set = new List<ChessPiece.TYPE>
+        {
+            ChessPiece.TYPE.ROOK, 
+            ChessPiece.TYPE.KNIGHT,
+            ChessPiece.TYPE.BISHOP,
+            ChessPiece.TYPE.QUEEN,
+            ChessPiece.TYPE.KING,
+            ChessPiece.TYPE.BISHOP,
+            ChessPiece.TYPE.KNIGHT,
+            ChessPiece.TYPE.ROOK
+        };
+
+        // Player 1
+        uint y1 = 0, y2 = 1, y3 = height - 2, y4 = height - 1;
+        for (uint x = 0; x < (uint)set.Count; ++x)
+        {
+            var pawn1 = getTileAt(x, y2);
+            pawn1.piece = Instantiate(piecePrefab, pawn1.transform);
+            pawn1.piece.SetPlayer(true);
+
+            var pawn2 = getTileAt(x, y3);
+            pawn2.piece = Instantiate(piecePrefab, pawn2.transform);
+            pawn2.piece.SetPlayer(false);
+
+            pawn1.piece.pieceType = pawn2.piece.pieceType = ChessPiece.TYPE.PAWN;
+
+            var piece1 = getTileAt(x, y1);
+            piece1.piece = Instantiate(piecePrefab, piece1.transform);
+            piece1.piece.SetPlayer(true);
+
+            var piece2 = getTileAt(x, y4);
+            piece2.piece = Instantiate(piecePrefab, piece2.transform);
+            piece2.piece.SetPlayer(false);
+
+            piece1.piece.pieceType = piece2.piece.pieceType = set[(int)x];
+        }
     }
 
     private void Update() {
@@ -230,14 +273,14 @@ public class GridManager : MonoBehaviour
     {
         Tile curr = null;
         // moving (/)
-        for (uint y = py, x = px; y < height && x < width; ++y, ++x)
+        for (uint y = py + 1, x = px + 1; y < height && x < width; ++y, ++x)
         {
             curr = getTileAt(x, y);
             movableSpaces.Add(curr);
             if (curr.HasPiece()) { break; }
         }
 
-        for (int y = (int)py, x = (int)px; y >= 0 && x >= 0; --y, --x)
+        for (int y = (int)py - 1, x = (int)px - 1; (y >= 0 && x >= 0); --y, --x)
         {
             curr = getTileAt((uint)x, (uint)y);
             movableSpaces.Add(curr);
@@ -245,14 +288,14 @@ public class GridManager : MonoBehaviour
         }
 
         // moving (\)
-        for (int y = (int)py, x = (int)px; y >= 0 && x < width; --y, ++x)
+        for (int y = (int)py - 1, x = (int)px + 1; y >= 0 && x < width; --y, ++x)
         {
             curr = getTileAt((uint)x, (uint)y);
             movableSpaces.Add(curr);
             if (curr.HasPiece()) { break; }
         }
 
-        for (int y = (int)py, x = (int)px; y < height && x >= 0; ++y, --x)
+        for (int y = (int)py + 1, x = (int)px - 1; y < height && x >= 0; ++y, --x)
         {
             curr = getTileAt((uint)x, (uint)y);
             movableSpaces.Add(curr);
